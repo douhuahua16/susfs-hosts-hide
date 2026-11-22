@@ -12,8 +12,22 @@
 
 1. 已 root（KernelSU LKM 模式）。
 2. 已在 KernelSU Manager 刷入以下两个模块并重启：
-   - `susfs_guard_lkm-module-<版本>-arm64.zip`
+   - `susfs_guard_lkm-module-v2.3.0-r18.8-arm64.zip`（**注意：用 r18.8，见下方"版本选择"**）
    - `ksu_module_susfs_<版本>.zip`
+
+## 版本选择（重要）
+
+`susfs4ksu-for-lkm` 在 **v2.3.0-r18.9** 起把内核符号解析器从「kprobe bootstrap」换成了「KallRecon」（release note #192）。KallRecon 靠**扫描内核内存找 kallsyms 符号表**，在部分非标准内核（如 5.15 HyperOS 移植内核）上会失败，表现为模块加载报错：
+
+```
+symbol_resolver: kallrecon discovery failed (4, klp=0), refusing to load
+# init_module 返回 errno 61 (ENODATA)
+```
+
+因此：
+
+- **5.15 HyperOS 移植内核（本用例）→ 用 v2.3.0-r18.8**（kprobe bootstrap，稳定）。
+- 标准 GKI 内核可尝试最新版，但若遇到上述报错，同样降级到 r18.8。
 
 ## 使用方法
 
